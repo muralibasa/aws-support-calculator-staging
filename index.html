@@ -303,12 +303,6 @@
         <label>Customer's Current Plan</label>
         <select class="plan-select" id="currentPlan" onchange="calculate()">
           <option value="">— Select current plan —</option>
-          <optgroup label="Legacy Plans (EOL Jan 2027)">
-            <option value="developer">Developer Support</option>
-            <option value="business">Business Support</option>
-            <option value="enterprise-on-ramp">Enterprise On-Ramp</option>
-            <option value="enterprise-legacy">Enterprise Support (Legacy)</option>
-          </optgroup>
           <optgroup label="New Plans (2026)">
             <option value="business-plus">Business Support+</option>
             <option value="enterprise-new">Enterprise Support (New)</option>
@@ -316,6 +310,12 @@
           </optgroup>
           <optgroup label="Partner Plans">
             <option value="partner-led">Partner-Led Support</option>
+          </optgroup>
+          <optgroup label="Legacy Plans (EOL Jan 2027)">
+            <option value="developer">Developer Support</option>
+            <option value="business">Business Support</option>
+            <option value="enterprise-on-ramp">Enterprise On-Ramp</option>
+            <option value="enterprise-legacy">Enterprise Support (Legacy)</option>
           </optgroup>
         </select>
       </div>
@@ -373,139 +373,139 @@
         <thead>
           <tr>
             <th style="min-width:170px;">Feature</th>
-            <th class="legacy-col">Developer<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
-            <th class="legacy-col">Business<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
-            <th class="legacy-col">Ent. On-Ramp<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
-            <th class="legacy-col">Enterprise<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
             <th class="new-col">Business Support+<br><small style="font-weight:400;opacity:.8;">New</small></th>
             <th class="new-col">Enterprise Support<br><small style="font-weight:400;opacity:.8;">New</small></th>
             <th class="new-col">Unified Operations<br><small style="font-weight:400;opacity:.8;">New</small></th>
             <th class="partner-col">Partner-Led Support<br><small style="font-weight:400;opacity:.8;">Via Partner</small></th>
+            <th class="legacy-col">Developer<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="legacy-col">Business<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="legacy-col">Ent. On-Ramp<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="legacy-col">Enterprise<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><strong>Minimum / month</strong></td>
-            <td>$29</td><td>$100</td><td>$5,500</td><td>$15,000</td>
             <td class="highlight-cell">$29</td>
             <td class="highlight-cell">$5,000 <span class="savings-pill">↓67%</span></td>
             <td class="highlight-cell">$50,000</td>
             <td style="color:#1565C0;font-weight:700;">$7,500</td>
+            <td>$29</td><td>$100</td><td>$5,500</td><td>$15,000</td>
           </tr>
           <tr>
             <td><strong>Est. monthly cost</strong></td>
-            <td id="t-dev">—</td><td id="t-bus">—</td><td id="t-eor">—</td><td id="t-ent">—</td>
             <td id="t-bsp" class="highlight-cell">—</td>
             <td id="t-esp" class="highlight-cell">—</td>
             <td id="t-uop" class="highlight-cell">—</td>
             <td id="t-pls" style="color:#1565C0;font-weight:700;">—</td>
+            <td id="t-dev">—</td><td id="t-bus">—</td><td id="t-eor">—</td><td id="t-ent">—</td>
           </tr>
           <tr>
             <td><strong>Pricing basis</strong></td>
-            <td>Per account</td><td>Per account</td><td>Aggregated</td><td>Aggregated</td>
             <td>Per account</td><td>Aggregated</td><td>Aggregated</td>
             <td>Aggregated (partner billing)</td>
+            <td>Per account</td><td>Per account</td><td>Aggregated</td><td>Aggregated</td>
           </tr>
           <tr>
             <td><strong>Who is billed</strong></td>
-            <td>Customer</td><td>Customer</td><td>Customer</td><td>Customer</td>
             <td>Customer</td><td>Customer</td><td>Customer</td>
             <td style="color:#1565C0;font-weight:600;">AWS Partner</td>
+            <td>Customer</td><td>Customer</td><td>Customer</td><td>Customer</td>
           </tr>
           <tr>
             <td><strong>AI-powered support</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
             <td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
           </tr>
           <tr>
             <td><strong>24/7 tech support</strong></td>
-            <td class="cross">✗ Bus. hrs</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
             <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
             <td class="check">✔</td>
+            <td class="cross">✗ Bus. hrs</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
           </tr>
           <tr>
             <td><strong>Fastest response time</strong></td>
-            <td>12 hours</td><td>1 hour</td><td>30 min</td><td>15 min</td>
             <td>1 hour</td><td>15 min</td><td>15 min</td>
             <td>15 min</td>
+            <td>12 hours</td><td>1 hour</td><td>30 min</td><td>15 min</td>
           </tr>
           <tr>
             <td><strong>Technical Account Manager</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td>Pool TAM</td><td class="check">✔ Designated</td>
             <td class="cross">✗</td><td class="check">✔ Designated</td><td class="check">✔ Designated</td>
             <td class="check">✔ Specialist TAM</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td>Pool TAM</td><td class="check">✔ Designated</td>
           </tr>
           <tr>
             <td><strong>AWS Trusted Advisor</strong></td>
-            <td>Core checks</td><td class="check">✔ Full</td><td class="check">✔ Full</td><td class="check">✔ Full</td>
             <td class="check">✔ Full</td><td class="check">✔ Full</td><td class="check">✔ Full</td>
             <td class="check">✔ Full (465+ checks)</td>
+            <td>Core checks</td><td class="check">✔ Full</td><td class="check">✔ Full</td><td class="check">✔ Full</td>
           </tr>
           <tr>
             <td><strong>Security Incident Response</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td>Add-on cost</td>
             <td class="cross">✗</td><td class="check">✔ Included</td><td class="check">✔ Included</td>
             <td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td>Add-on cost</td>
           </tr>
           <tr>
             <td><strong>AWS Countdown Premium</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td>$10K/project</td><td>$10K/project</td><td class="check">✔ Included</td>
             <td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
           </tr>
           <tr>
             <td><strong>Incident Detection &amp; Response</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td>Add-on cost</td>
             <td class="cross">✗</td><td>$7K min / 2%</td><td class="check">✔ Included</td>
             <td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td>Add-on cost</td>
           </tr>
           <tr>
             <td><strong>AWS Diagnostic Tooling</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="check">✔ Partner Access</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
           </tr>
           <tr>
             <td><strong>Partner Security Reviews</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="check">✔ Consolidated</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
           </tr>
           <tr>
             <td><strong>Partner discount eligibility</strong></td>
-            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="check">✔ Up to 40%</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
           </tr>
           <tr>
             <td><strong>3rd-party software support</strong></td>
-            <td class="cross">✗</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
             <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
             <td class="check">✔</td>
+            <td class="cross">✗</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
           </tr>
           <tr>
             <td><strong>Min. commitment</strong></td>
-            <td>30 days</td><td>30 days</td><td>30 days</td><td>30 days</td>
             <td>30 days</td><td>30 days</td><td>90 days</td>
             <td>30 days (no early cancel)</td>
+            <td>30 days</td><td>30 days</td><td>30 days</td><td>30 days</td>
           </tr>
           <tr>
             <td><strong>GovCloud available</strong></td>
-            <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
             <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
             <td class="cross">✗</td>
+            <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
           </tr>
           <tr>
             <td><strong>Status</strong></td>
-            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
-            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
-            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
-            <td style="color:#E65100;font-weight:600;">Upgrading</td>
             <td style="color:#1B5E20;font-weight:600;">Active ✔</td>
             <td style="color:#1B5E20;font-weight:600;">Active ✔</td>
             <td style="color:#1B5E20;font-weight:600;">Active ✔</td>
             <td style="color:#1565C0;font-weight:600;">Active ✔</td>
+            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
+            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
+            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
+            <td style="color:#E65100;font-weight:600;">Upgrading</td>
           </tr>
         </tbody>
       </table>
@@ -528,22 +528,6 @@
           </tr>
         </thead>
         <tbody>
-          <tr style="background:#FFF3E0;">
-            <td><strong>Developer</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
-            <td>Per account</td><td>3% of charges</td><td>—</td><td>—</td><td>—</td><td>$29/mo</td>
-          </tr>
-          <tr style="background:#FFF3E0;">
-            <td><strong>Business</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
-            <td>Per account</td><td>10% ≤$10K</td><td>7% $10K–$80K</td><td>5% $80K–$250K</td><td>3% >$250K</td><td>$100/mo</td>
-          </tr>
-          <tr style="background:#FFF3E0;">
-            <td><strong>Ent. On-Ramp</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
-            <td>Aggregated</td><td>10% of charges</td><td>—</td><td>—</td><td>—</td><td>$5,500/mo</td>
-          </tr>
-          <tr style="background:#FFF3E0;">
-            <td><strong>Enterprise</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
-            <td>Aggregated</td><td>10% ≤$150K</td><td>7% $150K–$500K</td><td>5% $500K–$1M</td><td>3% >$1M</td><td>$15,000/mo</td>
-          </tr>
           <tr style="background:#E8F5E9;">
             <td><strong>Business Support+</strong> <span style="font-size:9px;background:#C8E6C9;color:#1B5E20;padding:1px 5px;border-radius:4px;font-weight:600;">New</span></td>
             <td>Per account</td><td>9% ≤$10K</td><td>7% $10K–$80K</td><td>5% $80K–$250K</td><td>3% >$250K</td><td>$29/mo</td>
@@ -559,6 +543,22 @@
           <tr style="background:#E3F2FD;">
             <td><strong>Partner-Led Support</strong> <span style="font-size:9px;background:#BBDEFB;color:#1565C0;padding:1px 5px;border-radius:4px;font-weight:600;">Partner</span></td>
             <td>Aggregated (partner)</td><td>10% ≤$150K</td><td>7% $150K–$500K</td><td>5% $500K–$1M</td><td>3% >$1M</td><td>$7,500/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Developer</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Per account</td><td>3% of charges</td><td>—</td><td>—</td><td>—</td><td>$29/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Business</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Per account</td><td>10% ≤$10K</td><td>7% $10K–$80K</td><td>5% $80K–$250K</td><td>3% >$250K</td><td>$100/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Ent. On-Ramp</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Aggregated</td><td>10% of charges</td><td>—</td><td>—</td><td>—</td><td>$5,500/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Enterprise</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Aggregated</td><td>10% ≤$150K</td><td>7% $150K–$500K</td><td>5% $500K–$1M</td><td>3% >$1M</td><td>$15,000/mo</td>
           </tr>
         </tbody>
       </table>
@@ -832,11 +832,11 @@ function calculate() {
     if(el) el.textContent = fmtFull(v);
   });
 
-  // Savings grid
+  // Savings grid — New Plans first, Partner next, Legacy last
   const items = [
     { label:'Business → Business Support+',       diff: legacy[1].cost - newP[0].cost,   sub:`$${fmtN(legacy[1].cost)} → $${fmtN(newP[0].cost)}/mo` },
-    { label:'Enterprise → Enterprise Support',     diff: legacy[3].cost - newP[1].cost,   sub:`$${fmtN(legacy[3].cost)} → $${fmtN(newP[1].cost)}/mo` },
     { label:'Ent. On-Ramp → Enterprise Support',   diff: legacy[2].cost - newP[1].cost,   sub:`$${fmtN(legacy[2].cost)} → $${fmtN(newP[1].cost)}/mo` },
+    { label:'Enterprise → Enterprise Support',     diff: legacy[3].cost - newP[1].cost,   sub:`$${fmtN(legacy[3].cost)} → $${fmtN(newP[1].cost)}/mo` },
     { label:'Business → Partner-Led Support',      diff: legacy[1].cost - partnerP[0].cost, sub:`$${fmtN(legacy[1].cost)} → $${fmtN(partnerP[0].cost)}/mo (partner billed)` },
     { label:'Enterprise → Partner-Led Support',    diff: legacy[3].cost - partnerP[0].cost, sub:`$${fmtN(legacy[3].cost)} → $${fmtN(partnerP[0].cost)}/mo (partner billed)` },
     { label:'Your Monthly AWS Spend',              diff: spend, sub:'gross before discounts/credits', noSign:true },
