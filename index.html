@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Support Plan Pricing Calculator</title>
+<style>
+  :root {
+    --aws-orange: #FF9900;
+    --aws-dark: #232F3E;
+    --aws-green: #1E8E3E;
+    --aws-border: #DEDEDE;
+    --legacy-accent: #E65100;
+    --new-accent: #1B5E20;
+    --partner-accent: #1565C0;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #F0F2F5;
+    color: #1A1A2E;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--aws-dark);
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .header-logo { font-size: 22px; font-weight: 800; color: var(--aws-orange); letter-spacing: -0.5px; }
+  .header-title { font-size: 17px; font-weight: 600; color: #E0E0E0; }
+  .header-subtitle { font-size: 12px; color: #AAA; margin-top: 2px; }
+  .header-badge { margin-left: auto; background: var(--aws-orange); color: var(--aws-dark); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
+
+  .container { max-width: 1340px; margin: 0 auto; padding: 24px 20px; }
+
+  /* ── Input Card ── */
+  .input-card {
+    background: white; border-radius: 12px; padding: 24px 28px;
+    box-shadow: var(--card-shadow); margin-bottom: 24px; border: 1px solid var(--aws-border);
+  }
+  .input-card h2 { font-size: 16px; font-weight: 700; color: var(--aws-dark); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .input-card h2::before { content: "💰"; }
+  .input-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+  .input-group label { font-size: 13px; font-weight: 600; color: #555; }
+  .input-wrapper { position: relative; }
+  .input-wrapper span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #666; font-weight: 700; font-size: 15px; }
+  .input-wrapper input { width: 100%; padding: 10px 12px 10px 28px; border: 2px solid var(--aws-border); border-radius: 8px; font-size: 16px; font-weight: 600; color: var(--aws-dark); transition: border-color 0.2s; }
+  .input-wrapper input:focus { outline: none; border-color: var(--aws-orange); }
+  .slider-group { flex: 3; min-width: 300px; }
+  .slider-group label { font-size: 13px; font-weight: 600; color: #555; }
+  .slider-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+  input[type="range"] { flex: 1; -webkit-appearance: none; height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--aws-orange) 0%, var(--aws-border) 0%); outline: none; cursor: pointer; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--aws-orange); box-shadow: 0 2px 4px rgba(0,0,0,0.2); cursor: pointer; }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: 4px; }
+
+  /* ── Plan Selector ── */
+  .plan-select {
+    appearance: none; -webkit-appearance: none;
+    width: 100%; padding: 10px 36px 10px 14px;
+    border: 2px solid var(--aws-border); border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--aws-dark);
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 12px center;
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .plan-select:focus { outline: none; border-color: var(--aws-orange); }
+
+  /* ── Recommendation Panel ── */
+  .rec-panel {
+    background: white; border-radius: 12px; border: 2px solid var(--aws-orange);
+    box-shadow: 0 4px 20px rgba(255,153,0,0.15); margin-bottom: 24px; overflow: hidden;
+  }
+  .rec-header {
+    background: linear-gradient(135deg, #232F3E, #37475A);
+    padding: 14px 24px; display: flex; align-items: center; gap: 10px;
+  }
+  .rec-header-title { font-size: 14px; font-weight: 700; color: white; }
+  .rec-header-sub { font-size: 11px; color: #AAA; margin-top: 2px; }
+  .rec-star { font-size: 20px; }
+  .rec-body { padding: 20px 24px; }
+  .rec-flow {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    gap: 16px; margin-bottom: 20px;
+  }
+  .rec-plan-box {
+    border-radius: 10px; padding: 14px 16px;
+    border: 2px solid var(--aws-border);
+  }
+  .rec-plan-box.current { border-color: #FFCC80; background: #FFF8F0; }
+  .rec-plan-box.recommended { border-color: var(--aws-orange); background: #FFFBF0; box-shadow: 0 2px 10px rgba(255,153,0,0.12); }
+  .rec-plan-box.partner-rec { border-color: #90CAF9; background: #F0F7FF; }
+  .rec-plan-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .rec-plan-label.current-label { color: #E65100; }
+  .rec-plan-label.rec-label { color: #B45309; }
+  .rec-plan-label.partner-label { color: #1565C0; }
+  .rec-plan-name { font-size: 15px; font-weight: 800; color: var(--aws-dark); margin-bottom: 2px; }
+  .rec-plan-cost { font-size: 20px; font-weight: 800; color: var(--aws-dark); }
+  .rec-plan-cost span { font-size: 12px; font-weight: 500; color: #777; }
+  .rec-plan-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 8px; margin-top: 4px; }
+  .badge-eol { background: #FBE9E7; color: #E65100; border: 1px solid #FFCCBC; }
+  .badge-active { background: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7; }
+  .badge-partner-active { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+
+  .rec-arrow {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .rec-arrow-icon { font-size: 28px; color: var(--aws-orange); }
+  .rec-savings-pill {
+    background: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7;
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px;
+    white-space: nowrap;
+  }
+  .rec-savings-pill.cost-more { background: #FFF3E0; color: #E65100; border-color: #FFCC80; }
+  .rec-savings-pill.no-change { background: #F5F5F5; color: #555; border-color: #DDD; }
+
+  .rec-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rec-detail-box { background: #FAFAFA; border-radius: 8px; padding: 12px 14px; border: 1px solid #EEEEEE; }
+  .rec-detail-title { font-size: 11px; font-weight: 700; color: #555; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .rec-detail-list { list-style: none; }
+  .rec-detail-list li { font-size: 12px; padding: 3px 0; display: flex; align-items: flex-start; gap: 6px; color: #444; }
+  .rec-detail-list li span.gain-icon { color: #1B5E20; font-weight: 700; }
+  .rec-detail-list li span.note-icon { color: #E65100; }
+  .rec-why { font-size: 13px; color: #444; line-height: 1.6; margin-bottom: 16px; padding: 10px 14px; background: #FFFDE7; border-radius: 8px; border-left: 4px solid var(--aws-orange); }
+  .rec-none { padding: 20px; text-align: center; color: #888; font-size: 13px; }
+
+  /* ── Section Headers ── */
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .section-title { font-size: 15px; font-weight: 700; color: var(--aws-dark); }
+  .section-badge { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 10px; }
+  .badge-legacy { background: #FBE9E7; color: var(--legacy-accent); border: 1px solid #FFCCBC; }
+  .badge-new { background: #E8F5E9; color: var(--new-accent); border: 1px solid #C8E6C9; }
+  .badge-partner { background: #E3F2FD; color: var(--partner-accent); border: 1px solid #90CAF9; }
+  .badge-sunset { font-size: 11px; background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+
+  /* ── Plan Grid ── */
+  .plans-grid { display: grid; gap: 20px; margin-bottom: 24px; }
+  .legacy-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .new-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .partner-grid { grid-template-columns: minmax(300px, 520px); }
+
+  .plan-card {
+    background: white; border-radius: 12px; border: 2px solid var(--aws-border);
+    overflow: hidden; box-shadow: var(--card-shadow);
+    transition: transform 0.15s, box-shadow 0.15s; position: relative;
+  }
+  .plan-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+  .plan-card.legacy { border-color: #FFCC80; }
+  .plan-card.new-plan { border-color: #A5D6A7; }
+  .plan-card.partner-plan { border-color: #90CAF9; }
+
+  .plan-header { padding: 16px 18px 12px; }
+  .plan-header.legacy { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
+  .plan-header.new-plan { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); }
+  .plan-header.partner-plan { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+
+  .plan-name { font-size: 15px; font-weight: 800; color: var(--aws-dark); margin-bottom: 4px; }
+  .plan-tagline { font-size: 11px; color: #666; margin-bottom: 10px; }
+  .plan-price-display { background: white; border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .plan-price-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .plan-price-value { font-size: 22px; font-weight: 800; color: var(--aws-dark); margin: 2px 0; }
+  .plan-price-value span { font-size: 12px; font-weight: 500; color: #777; }
+  .plan-price-min { font-size: 10px; color: #999; }
+
+  .plan-body { padding: 14px 18px; }
+  .pricing-breakdown { background: #FAFAFA; border-radius: 6px; padding: 10px 12px; margin-bottom: 12px; font-size: 11px; color: #555; border: 1px solid #EEEEEE; }
+  .pricing-breakdown .tier-row { display: flex; justify-content: space-between; padding: 2px 0; }
+  .tier-row.active { color: var(--aws-dark); font-weight: 700; }
+  .tier-row.active .tier-amount { color: var(--aws-orange); }
+
+  .feature-list { list-style: none; }
+  .feature-list li { font-size: 12px; padding: 4px 0; display: flex; align-items: flex-start; gap: 6px; color: #444; border-bottom: 1px solid #F5F5F5; }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list li .icon { flex-shrink: 0; font-size: 12px; }
+  .feature-list li.missing { color: #BBB; }
+
+  /* ── Comparison Table ── */
+  .comparison-card {
+    background: white; border-radius: 12px; padding: 24px 28px;
+    box-shadow: var(--card-shadow); border: 1px solid var(--aws-border); margin-bottom: 24px; overflow-x: auto;
+  }
+  .comparison-card h2 { font-size: 16px; font-weight: 700; color: var(--aws-dark); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .comparison-card h2::before { content: "📊"; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 900px; }
+  th { background: var(--aws-dark); color: white; padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+  th.legacy-col { background: #E65100; }
+  th.new-col { background: #1B5E20; }
+  th.partner-col { background: #1565C0; }
+  td { padding: 9px 12px; border-bottom: 1px solid #F0F0F0; vertical-align: top; }
+  tr:nth-child(even) td { background: #FAFAFA; }
+  tr:hover td { background: #FFF8F0; }
+  .check { color: var(--aws-green); font-weight: 700; }
+  .cross { color: #CCC; }
+  .highlight-cell { font-weight: 700; color: var(--aws-orange); }
+  .savings-pill { display: inline-block; background: #E8F5E9; color: var(--new-accent); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 8px; border: 1px solid #A5D6A7; }
+
+  /* ── Notices ── */
+  .sunset-notice {
+    background: linear-gradient(135deg, #FFF3E0, #FFE0B2); border: 1px solid #FFCC80;
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .partner-notice {
+    background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border: 1px solid #90CAF9;
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .notice-icon { font-size: 22px; flex-shrink: 0; }
+  .notice-text { font-size: 13px; line-height: 1.5; }
+  .notice-text.sunset-text { color: #4E342E; }
+  .notice-text.partner-text { color: #0D3C61; }
+  .notice-text strong { color: var(--legacy-accent); }
+  .notice-text .partner-strong { color: var(--partner-accent); }
+
+  /* ── Savings Card ── */
+  .savings-card {
+    background: linear-gradient(135deg, #1B5E20, #2E7D32);
+    border-radius: 12px; padding: 22px 28px; color: white; margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(27,94,32,0.25);
+  }
+  .savings-card h2 { font-size: 15px; font-weight: 700; margin-bottom: 16px; opacity: 0.9; }
+  .savings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .savings-item { background: rgba(255,255,255,0.12); border-radius: 10px; padding: 14px 16px; }
+  .savings-item-label { font-size: 11px; opacity: 0.75; margin-bottom: 4px; }
+  .savings-item-value { font-size: 20px; font-weight: 800; }
+  .savings-item-sub { font-size: 10px; opacity: 0.6; margin-top: 2px; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: white; padding: 4px; border-radius: 10px; border: 1px solid var(--aws-border); width: fit-content; box-shadow: var(--card-shadow); }
+  .tab-btn { padding: 8px 18px; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: #777; }
+  .tab-btn.active { background: var(--aws-dark); color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── Footer ── */
+  .footer { text-align: center; font-size: 11px; color: #999; margin-top: 32px; padding-bottom: 24px; line-height: 1.6; }
+  .footer a { color: var(--aws-orange); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .header { padding: 14px 16px; }
+    .container { padding: 16px 12px; }
+    .input-card, .comparison-card { padding: 16px; }
+    .legacy-grid, .new-grid, .partner-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div><div class="header-logo">aws</div></div>
+  <div>
+    <div class="header-title">Support Plan Pricing Calculator</div>
+    <div class="header-subtitle">Compare legacy, new & partner-led AWS Support plans · Updated May 2026</div>
+  </div>
+  <div class="header-badge">2026 Plans</div>
+</div>
+
+<div class="container">
+
+  <!-- Notices -->
+  <div class="sunset-notice">
+    <div class="notice-icon">⚠️</div>
+    <div class="notice-text sunset-text">
+      <strong>Legacy Plans End of Support — January 1, 2027.</strong>
+      Developer Support, Business Support, and Enterprise On-Ramp are being discontinued. Enterprise On-Ramp customers will be auto-upgraded to Enterprise Support during 2026 renewal cycles.
+    </div>
+  </div>
+  <div class="partner-notice">
+    <div class="notice-icon">🤝</div>
+    <div class="notice-text partner-text">
+      <span class="partner-strong"><strong>Partner-Led Support (PLS)</strong></span> is billed to AWS Solution Provider Partners, not end customers directly. Partners resell support to their customers. PLS pricing is the same tier structure as Enterprise Support but with a <strong>$7,500/month minimum</strong>. Partners may also qualify for discounts up to 40% based on quality and performance metrics.
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-card">
+    <h2>Enter Your Monthly AWS Spend</h2>
+    <div class="input-row">
+      <div class="input-group" style="flex:1;min-width:160px;">
+        <label>Monthly AWS Charges (USD)</label>
+        <div class="input-wrapper">
+          <span>$</span>
+          <input type="number" id="monthlySpend" value="50000" min="0" max="10000000" step="1000" oninput="syncSlider(this.value); calculate()">
+        </div>
+      </div>
+      <div class="slider-group" style="flex:3;min-width:260px;">
+        <label>Drag to Adjust</label>
+        <div class="slider-wrapper">
+          <input type="range" id="spendSlider" min="0" max="2000000" step="5000" value="50000" oninput="syncInput(this.value); calculate()">
+        </div>
+        <div class="slider-labels">
+          <span>$0</span><span>$250K</span><span>$500K</span><span>$1M</span><span>$1.5M</span><span>$2M</span>
+        </div>
+      </div>
+      <div class="input-group" style="flex:1;min-width:200px;">
+        <label>Customer's Current Plan</label>
+        <select class="plan-select" id="currentPlan" onchange="calculate()">
+          <option value="">— Select current plan —</option>
+          <optgroup label="Legacy Plans (EOL Jan 2027)">
+            <option value="developer">Developer Support</option>
+            <option value="business">Business Support</option>
+            <option value="enterprise-on-ramp">Enterprise On-Ramp</option>
+            <option value="enterprise-legacy">Enterprise Support (Legacy)</option>
+          </optgroup>
+          <optgroup label="New Plans (2026)">
+            <option value="business-plus">Business Support+</option>
+            <option value="enterprise-new">Enterprise Support (New)</option>
+            <option value="unified-ops">Unified Operations</option>
+          </optgroup>
+          <optgroup label="Partner Plans">
+            <option value="partner-led">Partner-Led Support</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recommendation Panel -->
+  <div class="rec-panel" id="recPanel" style="display:none;">
+    <div class="rec-header">
+      <div class="rec-star">⭐</div>
+      <div>
+        <div class="rec-header-title">Recommended Upgrade Path</div>
+        <div class="rec-header-sub">Best available plan based on your current plan and spend</div>
+      </div>
+    </div>
+    <div class="rec-body" id="recBody"></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('cards')">Plan Cards</button>
+    <button class="tab-btn" onclick="switchTab('table')">Comparison Table</button>
+    <button class="tab-btn" onclick="switchTab('savings')">Savings Summary</button>
+  </div>
+
+  <!-- ══ TAB: Cards ══ -->
+  <div id="tab-cards" class="tab-content active">
+
+    <div class="section-header">
+      <div class="section-title">New Direct Plans (2026)</div>
+      <div class="section-badge badge-new">Current Offering</div>
+    </div>
+    <div class="plans-grid new-grid" id="newGrid"></div>
+
+    <div class="section-header" style="margin-top:8px;">
+      <div class="section-title">Partner-Led Support</div>
+      <div class="section-badge badge-partner">Via AWS Partners</div>
+    </div>
+    <div class="plans-grid partner-grid" id="partnerGrid"></div>
+
+    <div class="section-header" style="margin-top:8px;">
+      <div class="section-title">Legacy Plans</div>
+      <div class="section-badge badge-legacy">Being Discontinued</div>
+      <div class="badge-sunset">End of Support: Jan 1, 2027</div>
+    </div>
+    <div class="plans-grid legacy-grid" id="legacyGrid"></div>
+
+  </div>
+
+  <!-- ══ TAB: Comparison Table ══ -->
+  <div id="tab-table" class="tab-content">
+    <div class="comparison-card">
+      <h2>Full Plan Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="min-width:170px;">Feature</th>
+            <th class="legacy-col">Developer<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="legacy-col">Business<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="legacy-col">Ent. On-Ramp<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="legacy-col">Enterprise<br><small style="font-weight:400;opacity:.8;">Legacy</small></th>
+            <th class="new-col">Business Support+<br><small style="font-weight:400;opacity:.8;">New</small></th>
+            <th class="new-col">Enterprise Support<br><small style="font-weight:400;opacity:.8;">New</small></th>
+            <th class="new-col">Unified Operations<br><small style="font-weight:400;opacity:.8;">New</small></th>
+            <th class="partner-col">Partner-Led Support<br><small style="font-weight:400;opacity:.8;">Via Partner</small></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Minimum / month</strong></td>
+            <td>$29</td><td>$100</td><td>$5,500</td><td>$15,000</td>
+            <td class="highlight-cell">$29</td>
+            <td class="highlight-cell">$5,000 <span class="savings-pill">↓67%</span></td>
+            <td class="highlight-cell">$50,000</td>
+            <td style="color:#1565C0;font-weight:700;">$7,500</td>
+          </tr>
+          <tr>
+            <td><strong>Est. monthly cost</strong></td>
+            <td id="t-dev">—</td><td id="t-bus">—</td><td id="t-eor">—</td><td id="t-ent">—</td>
+            <td id="t-bsp" class="highlight-cell">—</td>
+            <td id="t-esp" class="highlight-cell">—</td>
+            <td id="t-uop" class="highlight-cell">—</td>
+            <td id="t-pls" style="color:#1565C0;font-weight:700;">—</td>
+          </tr>
+          <tr>
+            <td><strong>Pricing basis</strong></td>
+            <td>Per account</td><td>Per account</td><td>Aggregated</td><td>Aggregated</td>
+            <td>Per account</td><td>Aggregated</td><td>Aggregated</td>
+            <td>Aggregated (partner billing)</td>
+          </tr>
+          <tr>
+            <td><strong>Who is billed</strong></td>
+            <td>Customer</td><td>Customer</td><td>Customer</td><td>Customer</td>
+            <td>Customer</td><td>Customer</td><td>Customer</td>
+            <td style="color:#1565C0;font-weight:600;">AWS Partner</td>
+          </tr>
+          <tr>
+            <td><strong>AI-powered support</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
+            <td class="cross">✗</td>
+          </tr>
+          <tr>
+            <td><strong>24/7 tech support</strong></td>
+            <td class="cross">✗ Bus. hrs</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
+            <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
+            <td class="check">✔</td>
+          </tr>
+          <tr>
+            <td><strong>Fastest response time</strong></td>
+            <td>12 hours</td><td>1 hour</td><td>30 min</td><td>15 min</td>
+            <td>1 hour</td><td>15 min</td><td>15 min</td>
+            <td>15 min</td>
+          </tr>
+          <tr>
+            <td><strong>Technical Account Manager</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td>Pool TAM</td><td class="check">✔ Designated</td>
+            <td class="cross">✗</td><td class="check">✔ Designated</td><td class="check">✔ Designated</td>
+            <td class="check">✔ Specialist TAM</td>
+          </tr>
+          <tr>
+            <td><strong>AWS Trusted Advisor</strong></td>
+            <td>Core checks</td><td class="check">✔ Full</td><td class="check">✔ Full</td><td class="check">✔ Full</td>
+            <td class="check">✔ Full</td><td class="check">✔ Full</td><td class="check">✔ Full</td>
+            <td class="check">✔ Full (465+ checks)</td>
+          </tr>
+          <tr>
+            <td><strong>Security Incident Response</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td>Add-on cost</td>
+            <td class="cross">✗</td><td class="check">✔ Included</td><td class="check">✔ Included</td>
+            <td class="cross">✗</td>
+          </tr>
+          <tr>
+            <td><strong>AWS Countdown Premium</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td>$10K/project</td><td>$10K/project</td><td class="check">✔ Included</td>
+            <td class="cross">✗</td>
+          </tr>
+          <tr>
+            <td><strong>Incident Detection &amp; Response</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td>Add-on cost</td>
+            <td class="cross">✗</td><td>$7K min / 2%</td><td class="check">✔ Included</td>
+            <td class="cross">✗</td>
+          </tr>
+          <tr>
+            <td><strong>AWS Diagnostic Tooling</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="check">✔ Partner Access</td>
+          </tr>
+          <tr>
+            <td><strong>Partner Security Reviews</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="check">✔ Consolidated</td>
+          </tr>
+          <tr>
+            <td><strong>Partner discount eligibility</strong></td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="check">✔ Up to 40%</td>
+          </tr>
+          <tr>
+            <td><strong>3rd-party software support</strong></td>
+            <td class="cross">✗</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
+            <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
+            <td class="check">✔</td>
+          </tr>
+          <tr>
+            <td><strong>Min. commitment</strong></td>
+            <td>30 days</td><td>30 days</td><td>30 days</td><td>30 days</td>
+            <td>30 days</td><td>30 days</td><td>90 days</td>
+            <td>30 days (no early cancel)</td>
+          </tr>
+          <tr>
+            <td><strong>GovCloud available</strong></td>
+            <td class="check">✔</td><td class="check">✔</td><td class="check">✔</td><td class="check">✔</td>
+            <td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td>
+            <td class="cross">✗</td>
+          </tr>
+          <tr>
+            <td><strong>Status</strong></td>
+            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
+            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
+            <td style="color:#E65100;font-weight:600;">EOL Jan 2027</td>
+            <td style="color:#E65100;font-weight:600;">Upgrading</td>
+            <td style="color:#1B5E20;font-weight:600;">Active ✔</td>
+            <td style="color:#1B5E20;font-weight:600;">Active ✔</td>
+            <td style="color:#1B5E20;font-weight:600;">Active ✔</td>
+            <td style="color:#1565C0;font-weight:600;">Active ✔</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ TAB: Savings ══ -->
+  <div id="tab-savings" class="tab-content">
+    <div class="savings-card">
+      <h2>💡 Upgrade Savings Summary</h2>
+      <div class="savings-grid" id="savingsGrid"></div>
+    </div>
+
+    <div class="comparison-card">
+      <h2>Pricing Structure Breakdown</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th><th>Type</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th><th>Tier 4</th><th>Minimum</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Developer</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Per account</td><td>3% of charges</td><td>—</td><td>—</td><td>—</td><td>$29/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Business</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Per account</td><td>10% ≤$10K</td><td>7% $10K–$80K</td><td>5% $80K–$250K</td><td>3% >$250K</td><td>$100/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Ent. On-Ramp</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Aggregated</td><td>10% of charges</td><td>—</td><td>—</td><td>—</td><td>$5,500/mo</td>
+          </tr>
+          <tr style="background:#FFF3E0;">
+            <td><strong>Enterprise</strong> <span style="font-size:9px;background:#FFCCBC;color:#E65100;padding:1px 5px;border-radius:4px;font-weight:600;">Legacy</span></td>
+            <td>Aggregated</td><td>10% ≤$150K</td><td>7% $150K–$500K</td><td>5% $500K–$1M</td><td>3% >$1M</td><td>$15,000/mo</td>
+          </tr>
+          <tr style="background:#E8F5E9;">
+            <td><strong>Business Support+</strong> <span style="font-size:9px;background:#C8E6C9;color:#1B5E20;padding:1px 5px;border-radius:4px;font-weight:600;">New</span></td>
+            <td>Per account</td><td>9% ≤$10K</td><td>7% $10K–$80K</td><td>5% $80K–$250K</td><td>3% >$250K</td><td>$29/mo</td>
+          </tr>
+          <tr style="background:#E8F5E9;">
+            <td><strong>Enterprise Support</strong> <span style="font-size:9px;background:#C8E6C9;color:#1B5E20;padding:1px 5px;border-radius:4px;font-weight:600;">New</span></td>
+            <td>Aggregated</td><td>10% ≤$150K</td><td>7% $150K–$500K</td><td>5% $500K–$1M</td><td>3% >$1M</td><td>$5,000/mo</td>
+          </tr>
+          <tr style="background:#E8F5E9;">
+            <td><strong>Unified Operations</strong> <span style="font-size:9px;background:#C8E6C9;color:#1B5E20;padding:1px 5px;border-radius:4px;font-weight:600;">New</span></td>
+            <td>Aggregated</td><td>10% ≤$1M</td><td>6% $1M–$5M</td><td>5% >$5M</td><td>—</td><td>$50,000/mo</td>
+          </tr>
+          <tr style="background:#E3F2FD;">
+            <td><strong>Partner-Led Support</strong> <span style="font-size:9px;background:#BBDEFB;color:#1565C0;padding:1px 5px;border-radius:4px;font-weight:600;">Partner</span></td>
+            <td>Aggregated (partner)</td><td>10% ≤$150K</td><td>7% $150K–$500K</td><td>5% $500K–$1M</td><td>3% >$1M</td><td>$7,500/mo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Pricing from <a href="https://aws.amazon.com/premiumsupport/pricing/" target="_blank">aws.amazon.com/premiumsupport/pricing</a> ·
+    <a href="https://aws.amazon.com/premiumsupport/partner-led-support/pricing/" target="_blank">Partner-Led Support Pricing</a> ·
+    <a href="https://docs.aws.amazon.com/awssupport/latest/user/support-plans-eos.html" target="_blank">Legacy EOL Notice</a> ·
+    For estimation purposes only. Always verify at <a href="https://aws.amazon.com/premiumsupport/plans/" target="_blank">aws.amazon.com/premiumsupport/plans</a>.
+  </div>
+</div>
+
+<script>
+// ── Calculation Functions ─────────────────────────────────────
+function calcDeveloper(s) { return Math.max(29, s * 0.03); }
+
+function calcBusiness(s) {
+  let c = 0;
+  if (s <= 10000)       c = s * 0.10;
+  else if (s <= 80000)  c = 1000 + (s-10000)*0.07;
+  else if (s <= 250000) c = 1000 + 4900 + (s-80000)*0.05;
+  else                  c = 1000 + 4900 + 8500 + (s-250000)*0.03;
+  return Math.max(100, c);
+}
+
+function calcEnterpriseOnRamp(s) { return Math.max(5500, s * 0.10); }
+
+function calcEnterpriseShared(s, minFee) {
+  // Shared tier structure: 10%/150K, 7%/500K, 5%/1M, 3%+
+  let c = 0;
+  if (s <= 150000)       c = s * 0.10;
+  else if (s <= 500000)  c = 15000 + (s-150000)*0.07;
+  else if (s <= 1000000) c = 15000 + 24500 + (s-500000)*0.05;
+  else                   c = 15000 + 24500 + 25000 + (s-1000000)*0.03;
+  return Math.max(minFee, c);
+}
+
+function calcBusinessPlus(s) {
+  let c = 0;
+  if (s <= 10000)       c = s * 0.09;
+  else if (s <= 80000)  c = 900 + (s-10000)*0.07;
+  else if (s <= 250000) c = 900 + 4900 + (s-80000)*0.05;
+  else                  c = 900 + 4900 + 8500 + (s-250000)*0.03;
+  return Math.max(29, c);
+}
+
+function calcUnifiedOps(s) {
+  let c = 0;
+  if (s <= 1000000)      c = s * 0.10;
+  else if (s <= 5000000) c = 100000 + (s-1000000)*0.06;
+  else                   c = 100000 + 240000 + (s-5000000)*0.05;
+  return Math.max(50000, c);
+}
+
+// ── Breakdown HTML Generators ─────────────────────────────────
+function fmtN(n) { return Math.round(n).toLocaleString('en-US'); }
+function fmtK(n) { if(n>=1000000) return (n/1000000)+'M'; if(n>=1000) return (n/1000)+'K'; return n; }
+function fmtFull(n) { return '$' + fmtN(n) + '/mo'; }
+
+function devBreakdown(s) {
+  const pct = s*0.03, used = pct >= 29;
+  return `<div class="tier-row ${used?'active':''}"><span>3% × $${fmtN(s)}</span><span class="tier-amount">$${fmtN(pct)}</span></div>
+          <div class="tier-row"><span>Minimum</span><span>$29</span></div>`;
+}
+function busBreakdown(s) {
+  let rows=[], t1=Math.min(s,10000)*0.10, t2=0, t3=0, t4=0;
+  if(s>10000)  t2=Math.min(s-10000,70000)*0.07;
+  if(s>80000)  t3=Math.min(s-80000,170000)*0.05;
+  if(s>250000) t4=(s-250000)*0.03;
+  rows.push(`<div class="tier-row active"><span>10% × $${fmtN(Math.min(s,10000))} (≤$10K)</span><span class="tier-amount">$${fmtN(t1)}</span></div>`);
+  if(s>10000)  rows.push(`<div class="tier-row active"><span>7% × $${fmtN(Math.min(s-10000,70000))} ($10K–$80K)</span><span class="tier-amount">$${fmtN(t2)}</span></div>`);
+  if(s>80000)  rows.push(`<div class="tier-row active"><span>5% × $${fmtN(Math.min(s-80000,170000))} ($80K–$250K)</span><span class="tier-amount">$${fmtN(t3)}</span></div>`);
+  if(s>250000) rows.push(`<div class="tier-row active"><span>3% × $${fmtN(s-250000)} (>$250K)</span><span class="tier-amount">$${fmtN(t4)}</span></div>`);
+  rows.push(`<div class="tier-row"><span>Minimum</span><span>$100</span></div>`);
+  return rows.join('');
+}
+function bspBreakdown(s) {
+  let rows=[], t1=Math.min(s,10000)*0.09, t2=0, t3=0, t4=0;
+  if(s>10000)  t2=Math.min(s-10000,70000)*0.07;
+  if(s>80000)  t3=Math.min(s-80000,170000)*0.05;
+  if(s>250000) t4=(s-250000)*0.03;
+  rows.push(`<div class="tier-row active"><span>9% × $${fmtN(Math.min(s,10000))} (≤$10K)</span><span class="tier-amount">$${fmtN(t1)}</span></div>`);
+  if(s>10000)  rows.push(`<div class="tier-row active"><span>7% × $${fmtN(Math.min(s-10000,70000))} ($10K–$80K)</span><span class="tier-amount">$${fmtN(t2)}</span></div>`);
+  if(s>80000)  rows.push(`<div class="tier-row active"><span>5% × $${fmtN(Math.min(s-80000,170000))} ($80K–$250K)</span><span class="tier-amount">$${fmtN(t3)}</span></div>`);
+  if(s>250000) rows.push(`<div class="tier-row active"><span>3% × $${fmtN(s-250000)} (>$250K)</span><span class="tier-amount">$${fmtN(t4)}</span></div>`);
+  rows.push(`<div class="tier-row"><span>Minimum</span><span>$29</span></div>`);
+  return rows.join('');
+}
+function entBreakdown(s, minFee) {
+  let rows=[];
+  const t1=Math.min(s,150000)*0.10;
+  rows.push(`<div class="tier-row active"><span>10% × $${fmtN(Math.min(s,150000))} (≤$150K)</span><span class="tier-amount">$${fmtN(t1)}</span></div>`);
+  if(s>150000) { const t2=Math.min(s-150000,350000)*0.07; rows.push(`<div class="tier-row active"><span>7% × $${fmtN(Math.min(s-150000,350000))} ($150K–$500K)</span><span class="tier-amount">$${fmtN(t2)}</span></div>`); }
+  if(s>500000) { const t3=Math.min(s-500000,500000)*0.05; rows.push(`<div class="tier-row active"><span>5% × $${fmtN(Math.min(s-500000,500000))} ($500K–$1M)</span><span class="tier-amount">$${fmtN(t3)}</span></div>`); }
+  if(s>1000000){ const t4=(s-1000000)*0.03; rows.push(`<div class="tier-row active"><span>3% × $${fmtN(s-1000000)} (>$1M)</span><span class="tier-amount">$${fmtN(t4)}</span></div>`); }
+  rows.push(`<div class="tier-row"><span>Minimum</span><span>$${fmtN(minFee)}</span></div>`);
+  return rows.join('');
+}
+function uopBreakdown(s) {
+  let rows=[];
+  rows.push(`<div class="tier-row active"><span>10% × $${fmtN(Math.min(s,1000000))} (≤$1M)</span><span class="tier-amount">$${fmtN(Math.min(s,1000000)*0.10)}</span></div>`);
+  if(s>1000000) { const t2=Math.min(s-1000000,4000000)*0.06; rows.push(`<div class="tier-row active"><span>6% × $${fmtN(Math.min(s-1000000,4000000))} ($1M–$5M)</span><span class="tier-amount">$${fmtN(t2)}</span></div>`); }
+  if(s>5000000) { const t3=(s-5000000)*0.05; rows.push(`<div class="tier-row active"><span>5% × $${fmtN(s-5000000)} (>$5M)</span><span class="tier-amount">$${fmtN(t3)}</span></div>`); }
+  rows.push(`<div class="tier-row"><span>Minimum</span><span>$50,000</span></div>`);
+  return rows.join('');
+}
+
+// ── Plan Data ─────────────────────────────────────────────────
+function getLegacyPlans(s) {
+  return [
+    { name:'Developer', tagline:'Dev/test — Business hours support', type:'legacy',
+      cost:calcDeveloper(s), minCost:29, breakdown:devBreakdown(s),
+      features:[
+        {icon:'✔',text:'Core Trusted Advisor checks'},
+        {icon:'✔',text:'Business-hours email support'},
+        {icon:'✔',text:'12-hr response (general guidance)'},
+        {icon:'✔',text:'AWS Health Dashboard'},
+        {icon:'✗',text:'24/7 phone/chat support',missing:true},
+        {icon:'✗',text:'Full Trusted Advisor',missing:true},
+        {icon:'✗',text:'TAM',missing:true},
+        {icon:'✗',text:'AI-powered support',missing:true},
+      ]},
+    { name:'Business', tagline:'Production — 24/7 support', type:'legacy',
+      cost:calcBusiness(s), minCost:100, breakdown:busBreakdown(s),
+      features:[
+        {icon:'✔',text:'Full Trusted Advisor'},
+        {icon:'✔',text:'24/7 phone, chat & email'},
+        {icon:'✔',text:'1-hr response (critical)'},
+        {icon:'✔',text:'AWS Health API'},
+        {icon:'✗',text:'TAM',missing:true},
+        {icon:'✗',text:'Security Incident Response',missing:true},
+        {icon:'✗',text:'AI-powered support',missing:true},
+      ]},
+    { name:'Enterprise On-Ramp', tagline:'Growing — Pool TAM, 30-min response', type:'legacy',
+      cost:calcEnterpriseOnRamp(s), minCost:5500,
+      breakdown:`<div class="tier-row active"><span>10% × $${fmtN(s)}</span><span class="tier-amount">$${fmtN(s*0.10)}</span></div><div class="tier-row"><span>Minimum</span><span>$5,500</span></div>`,
+      features:[
+        {icon:'✔',text:'24/7 support — 30-min critical'},
+        {icon:'✔',text:'Full Trusted Advisor'},
+        {icon:'✔',text:'Pool of TAMs (shared)'},
+        {icon:'✔',text:'Annual operational review'},
+        {icon:'✗',text:'Designated TAM',missing:true},
+        {icon:'✗',text:'Security Incident Response',missing:true},
+        {icon:'✗',text:'AI-powered support',missing:true},
+      ]},
+    { name:'Enterprise', tagline:'Mission-critical — Designated TAM, 15-min', type:'legacy',
+      cost:calcEnterpriseShared(s,15000), minCost:15000, breakdown:entBreakdown(s,15000),
+      features:[
+        {icon:'✔',text:'24/7 support — 15-min critical'},
+        {icon:'✔',text:'Designated TAM'},
+        {icon:'✔',text:'Full Trusted Advisor'},
+        {icon:'✔',text:'Proactive guidance & reviews'},
+        {icon:'✔',text:'Security Incident Response (add-on)'},
+        {icon:'✔',text:'Concierge & billing support'},
+        {icon:'✗',text:'AI-powered support',missing:true},
+      ]},
+  ];
+}
+
+function getNewPlans(s) {
+  return [
+    { name:'Business Support+', tagline:'AI-powered — Replaces Developer & Business', type:'new-plan',
+      cost:calcBusinessPlus(s), minCost:29, breakdown:bspBreakdown(s),
+      features:[
+        {icon:'🤖',text:'AI-powered contextual assistance'},
+        {icon:'✔',text:'24/7 phone, chat & email'},
+        {icon:'✔',text:'1-hr response (critical)'},
+        {icon:'✔',text:'Full Trusted Advisor'},
+        {icon:'✔',text:'Per-account billing'},
+        {icon:'✗',text:'Designated TAM',missing:true},
+        {icon:'✗',text:'Security Incident Response',missing:true},
+      ]},
+    { name:'Enterprise Support', tagline:'AI + expert guidance — $5K minimum', type:'new-plan',
+      cost:calcEnterpriseShared(s,5000), minCost:5000, breakdown:entBreakdown(s,5000),
+      features:[
+        {icon:'🤖',text:'AI-powered expert guidance'},
+        {icon:'✔',text:'24/7 support — 15-min critical'},
+        {icon:'✔',text:'Designated TAM'},
+        {icon:'✔',text:'Security Incident Response (incl.)'},
+        {icon:'✔',text:'Operational reviews'},
+        {icon:'✔',text:'Min. reduced $15K → $5K'},
+        {icon:'✔',text:'Full Trusted Advisor'},
+      ]},
+    { name:'Unified Operations', tagline:'All-inclusive — Proactive ops at scale', type:'new-plan',
+      cost:calcUnifiedOps(s), minCost:50000, breakdown:uopBreakdown(s),
+      features:[
+        {icon:'🤖',text:'AI-powered proactive operations'},
+        {icon:'✔',text:'24/7 support — 15-min critical'},
+        {icon:'✔',text:'Designated TAM'},
+        {icon:'✔',text:'Security Incident Response (incl.)'},
+        {icon:'✔',text:'Countdown Premium (included)'},
+        {icon:'✔',text:'Incident Detection & Response (incl.)'},
+        {icon:'✔',text:'90-day minimum commitment'},
+      ]},
+  ];
+}
+
+function getPartnerPlans(s) {
+  return [
+    { name:'Partner-Led Support (PLS)', tagline:'Via AWS Solution Provider Partners — Specialist TAM, 15-min response, diagnostic tooling', type:'partner-plan',
+      cost:calcEnterpriseShared(s,7500), minCost:7500, breakdown:entBreakdown(s,7500),
+      features:[
+        {icon:'🤝',text:'Billed to AWS Partners, not end-customers'},
+        {icon:'✔',text:'24/7 phone, chat & web support'},
+        {icon:'✔',text:'15-min response (business critical)'},
+        {icon:'✔',text:'Specialist TAM — consultative guidance'},
+        {icon:'✔',text:'Full Trusted Advisor (465+ checks)'},
+        {icon:'✔',text:'AWS Health & AWS Support API'},
+        {icon:'✔',text:'AWS Diagnostic Tooling access'},
+        {icon:'✔',text:'Partner Security Reviews (consolidated)'},
+        {icon:'✔',text:'3rd-party software support'},
+        {icon:'✔',text:'Strategic Business Reviews'},
+        {icon:'⭐',text:'Partner discount up to 40%'},
+        {icon:'✔',text:'"Backed by AWS Support" badge'},
+        {icon:'✗',text:'AI-powered support',missing:true},
+        {icon:'✗',text:'Security Incident Response',missing:true},
+      ]},
+  ];
+}
+
+// ── Render Plan Card ──────────────────────────────────────────
+function renderCard(p) {
+  return `
+    <div class="plan-card ${p.type}">
+      <div class="plan-header ${p.type}">
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-tagline">${p.tagline}</div>
+        <div class="plan-price-display">
+          <div class="plan-price-label">Estimated Monthly Cost</div>
+          <div class="plan-price-value">$${fmtN(p.cost)}<span>/mo</span></div>
+          <div class="plan-price-min">Minimum: $${fmtN(p.minCost)}/mo</div>
+        </div>
+      </div>
+      <div class="plan-body">
+        <div class="pricing-breakdown">
+          <div style="font-weight:700;color:#333;margin-bottom:6px;font-size:11px;">📐 Pricing Calculation</div>
+          ${p.breakdown}
+        </div>
+        <ul class="feature-list">
+          ${p.features.map(f=>`<li class="${f.missing?'missing':''}"><span class="icon">${f.icon}</span><span>${f.text}</span></li>`).join('')}
+        </ul>
+      </div>
+    </div>`;
+}
+
+// ── Main Calculate ────────────────────────────────────────────
+function calculate() {
+  const spend = parseFloat(document.getElementById('monthlySpend').value) || 0;
+
+  // Slider gradient
+  const pct = Math.min((spend/2000000)*100,100);
+  document.getElementById('spendSlider').style.background =
+    `linear-gradient(to right, #FF9900 ${pct}%, #DEDEDE ${pct}%)`;
+
+  const legacy = getLegacyPlans(spend);
+  const newP   = getNewPlans(spend);
+  const partnerP = getPartnerPlans(spend);
+
+  // Render cards
+  document.getElementById('legacyGrid').innerHTML  = legacy.map(renderCard).join('');
+  document.getElementById('newGrid').innerHTML     = newP.map(renderCard).join('');
+  document.getElementById('partnerGrid').innerHTML = partnerP.map(renderCard).join('');
+
+  // Table cells
+  const map = { dev:legacy[0].cost, bus:legacy[1].cost, eor:legacy[2].cost, ent:legacy[3].cost,
+                bsp:newP[0].cost, esp:newP[1].cost, uop:newP[2].cost, pls:partnerP[0].cost };
+  Object.entries(map).forEach(([k,v]) => {
+    const el = document.getElementById('t-'+k);
+    if(el) el.textContent = fmtFull(v);
+  });
+
+  // Savings grid
+  const items = [
+    { label:'Business → Business Support+',       diff: legacy[1].cost - newP[0].cost,   sub:`$${fmtN(legacy[1].cost)} → $${fmtN(newP[0].cost)}/mo` },
+    { label:'Enterprise → Enterprise Support',     diff: legacy[3].cost - newP[1].cost,   sub:`$${fmtN(legacy[3].cost)} → $${fmtN(newP[1].cost)}/mo` },
+    { label:'Ent. On-Ramp → Enterprise Support',   diff: legacy[2].cost - newP[1].cost,   sub:`$${fmtN(legacy[2].cost)} → $${fmtN(newP[1].cost)}/mo` },
+    { label:'Business → Partner-Led Support',      diff: legacy[1].cost - partnerP[0].cost, sub:`$${fmtN(legacy[1].cost)} → $${fmtN(partnerP[0].cost)}/mo (partner billed)` },
+    { label:'Enterprise → Partner-Led Support',    diff: legacy[3].cost - partnerP[0].cost, sub:`$${fmtN(legacy[3].cost)} → $${fmtN(partnerP[0].cost)}/mo (partner billed)` },
+    { label:'Your Monthly AWS Spend',              diff: spend, sub:'gross before discounts/credits', noSign:true },
+  ];
+
+  renderRecommendation(spend);
+
+  document.getElementById('savingsGrid').innerHTML = items.map(item => {
+    const pos = item.diff >= 0;
+    const sign = item.noSign ? '' : (pos ? '💰 Save ' : '⚠️ +');
+    const borderColor = item.noSign ? 'rgba(255,255,255,0.3)' : (pos ? '#A5D6A7' : '#FFCC80');
+    return `<div class="savings-item" style="border:1px solid ${borderColor}">
+      <div class="savings-item-label">${item.label}</div>
+      <div class="savings-item-value">${sign}$${fmtN(Math.abs(item.diff))}/mo</div>
+      <div class="savings-item-sub">${item.sub}</div>
+    </div>`;
+  }).join('');
+}
+
+function syncSlider(v) { document.getElementById('spendSlider').value = Math.min(v,2000000); }
+function syncInput(v)  { document.getElementById('monthlySpend').value = v; }
+function switchTab(tab) {
+  const tabs = ['cards','table','savings'];
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', tabs[i]===tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ── Recommendation Engine ─────────────────────────────────────
+const REC_MAP = {
+  developer: {
+    label: 'Developer Support', eol: true,
+    rec: 'business-plus',
+    why: 'Business Support+ is the direct successor to Developer Support. It keeps the same $29/month minimum while adding AI-powered 24/7 support, full Trusted Advisor access, and faster critical response — at the same or lower cost for most spend levels.',
+    gains: ['AI-powered contextual assistance','24/7 phone & chat (was business hrs only)','Full Trusted Advisor (465+ checks)','1-hr critical response (was 12 hrs)'],
+    notes: ['Not available in AWS GovCloud','Per-account billing (same as Developer)'],
+  },
+  business: {
+    label: 'Business Support', eol: true,
+    rec: 'business-plus',
+    why: 'Business Support+ replaces Business Support with a lower Tier 1 rate (9% vs 10% on first $10K), adds AI-powered support, and maintains the same pricing structure. This is the natural migration path recommended by AWS before the Jan 2027 EOL.',
+    gains: ['AI-powered contextual assistance','Lower Tier 1 rate: 9% vs 10% (≤$10K)','Enhanced AI-driven guidance','Same 24/7 support and response times'],
+    notes: ['Not available in AWS GovCloud','Per-account billing continues','No TAM — upgrade to Enterprise for TAM'],
+  },
+  'enterprise-on-ramp': {
+    label: 'Enterprise On-Ramp', eol: true,
+    rec: 'enterprise-new',
+    why: 'Enterprise On-Ramp customers are automatically upgraded to Enterprise Support during 2026 renewals. Enterprise Support offers a lower $5,000/month minimum (vs $5,500), a designated TAM (vs pool TAM), 15-minute response (vs 30-min), AI-powered guidance, and Security Incident Response included at no extra cost.',
+    gains: ['Designated TAM (was pool/shared TAM)','15-min critical response (was 30 min)','Security Incident Response included','AI-powered expert guidance','Lower minimum: $5,000 vs $5,500/mo'],
+    notes: ['Auto-upgrade in 2026 — no action needed','Not available in AWS GovCloud','Same enterprise tier rate structure'],
+  },
+  'enterprise-legacy': {
+    label: 'Enterprise Support (Legacy)', eol: true,
+    rec: 'enterprise-new',
+    why: 'New Enterprise Support retains all the same features but reduces the monthly minimum by 67% — from $15,000 to $5,000. Additionally, Security Incident Response is now included at no extra cost, and AI-powered expert guidance is added. This is the single best upgrade value across all plans.',
+    gains: ['Monthly minimum cut 67%: $15K → $5K','Security Incident Response now included','AI-powered expert guidance added','Same designated TAM, 15-min response','Same tier rate structure (10/7/5/3%)'],
+    notes: ['Not available in AWS GovCloud','Confirm your TAM assignment carries over','Contact AWS to initiate upgrade'],
+  },
+  'business-plus': {
+    label: 'Business Support+', eol: false,
+    rec: 'enterprise-new',
+    why: 'You are already on a current plan. If your workloads require a designated TAM, 15-minute critical response, or Security Incident Response, upgrading to Enterprise Support is the logical next step. Otherwise, Business Support+ is already the best fit for your tier.',
+    gains: ['Designated TAM assigned','15-min critical response (was 1 hr)','Security Incident Response included','Operational reviews & proactive guidance','Aggregated billing across all accounts'],
+    notes: ['Minimum jumps to $5,000/mo','Aggregated vs per-account billing model','Consider Unified Operations for $50K+ scale'],
+  },
+  'enterprise-new': {
+    label: 'Enterprise Support (New)', eol: false,
+    rec: 'unified-ops',
+    why: 'You are already on the latest Enterprise Support plan. Unified Operations is the premium tier if you need fully included Countdown Premium, Incident Detection & Response, and enhanced proactive operations at scale — all bundled at no extra cost.',
+    gains: ['Countdown Premium included (saves $10K/project)','Incident Detection & Response included','Enhanced proactive operations','Premium operational reviews','Tailored for large-scale AWS footprints'],
+    notes: ['Minimum is $50,000/mo','90-day minimum commitment','Best suited for $500K+ monthly spend'],
+  },
+  'unified-ops': {
+    label: 'Unified Operations', eol: false,
+    rec: null,
+    why: 'You are already on the highest-tier AWS Support plan. Unified Operations is the most comprehensive plan AWS offers, with all features included.',
+    gains: [],
+    notes: ['No higher direct plan available','Contact AWS for custom enterprise agreements'],
+  },
+  'partner-led': {
+    label: 'Partner-Led Support', eol: false,
+    rec: 'enterprise-new',
+    why: 'Partner-Led Support is an active plan billed through AWS Partners. If you are looking for a direct AWS plan with comparable features (designated TAM, 15-min response, Security IR included, AI-powered guidance), Enterprise Support is the closest equivalent — and at a lower $5,000 minimum vs PLS\'s $7,500.',
+    gains: ['AI-powered expert guidance (not in PLS)','Security Incident Response included','Lower minimum: $5,000 vs $7,500','Direct billing from AWS (not via partner)'],
+    notes: ['Lose AWS Diagnostic Tooling access','Lose Partner Security Reviews','Lose "Backed by AWS Support" badge','PLS remains active if partner route preferred'],
+  },
+};
+
+const PLAN_COST_FN = {
+  developer:        s => calcDeveloper(s),
+  business:         s => calcBusiness(s),
+  'enterprise-on-ramp': s => calcEnterpriseOnRamp(s),
+  'enterprise-legacy':  s => calcEnterpriseShared(s, 15000),
+  'business-plus':  s => calcBusinessPlus(s),
+  'enterprise-new': s => calcEnterpriseShared(s, 5000),
+  'unified-ops':    s => calcUnifiedOps(s),
+  'partner-led':    s => calcEnterpriseShared(s, 7500),
+};
+const PLAN_LABEL = {
+  'business-plus': 'Business Support+',
+  'enterprise-new': 'Enterprise Support (New)',
+  'unified-ops': 'Unified Operations',
+  'partner-led': 'Partner-Led Support',
+};
+const PLAN_TYPE_CLASS = {
+  'business-plus': 'recommended',
+  'enterprise-new': 'recommended',
+  'unified-ops': 'recommended',
+  'partner-led': 'partner-rec',
+};
+const PLAN_STATUS_BADGE = {
+  'business-plus': '<span class="rec-plan-badge badge-active">Active ✔</span>',
+  'enterprise-new': '<span class="rec-plan-badge badge-active">Active ✔</span>',
+  'unified-ops': '<span class="rec-plan-badge badge-active">Active ✔</span>',
+  'partner-led': '<span class="rec-plan-badge badge-partner-active">Partner Active ✔</span>',
+};
+
+function renderRecommendation(spend) {
+  const sel = document.getElementById('currentPlan').value;
+  const panel = document.getElementById('recPanel');
+  const body  = document.getElementById('recBody');
+
+  if (!sel) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  const info = REC_MAP[sel];
+  const currentCost = PLAN_COST_FN[sel] ? PLAN_COST_FN[sel](spend) : 0;
+  const eolBadge = info.eol
+    ? '<span class="rec-plan-badge badge-eol">EOL Jan 2027</span>'
+    : '<span class="rec-plan-badge badge-active">Currently Active</span>';
+
+  if (!info.rec) {
+    // Already on top plan
+    body.innerHTML = `
+      <div class="rec-why">${info.why}</div>
+      <div style="display:flex;align-items:center;gap:12px;background:#F9FBE7;border-radius:8px;padding:12px 16px;border:1px solid #F0F4C3;">
+        <span style="font-size:24px;">🏆</span>
+        <div>
+          <div style="font-weight:700;color:#33691E;font-size:14px;">${info.label}</div>
+          <div style="font-size:12px;color:#558B2F;">Estimated cost: <strong>$${fmtN(currentCost)}/mo</strong> — You are on the highest available plan.</div>
+        </div>
+      </div>
+      ${info.notes.length ? `<div class="rec-detail-box" style="margin-top:14px;"><div class="rec-detail-title">📌 Notes</div><ul class="rec-detail-list">${info.notes.map(n=>`<li><span class="note-icon">ℹ️</span>${n}</li>`).join('')}</ul></div>` : ''}
+    `;
+    return;
+  }
+
+  const recId   = info.rec;
+  const recCost = PLAN_COST_FN[recId](spend);
+  const diff    = currentCost - recCost;
+  const recTypeClass = PLAN_TYPE_CLASS[recId] || 'recommended';
+  const recLabel = PLAN_LABEL[recId] || recId;
+  const recBadge = PLAN_STATUS_BADGE[recId] || '';
+
+  let savingsPillClass = 'rec-savings-pill';
+  let savingsText = '';
+  if (Math.abs(diff) < 1) {
+    savingsPillClass += ' no-change';
+    savingsText = 'Same cost';
+  } else if (diff > 0) {
+    savingsText = `Save $${fmtN(diff)}/mo`;
+  } else {
+    savingsPillClass += ' cost-more';
+    savingsText = `+$${fmtN(Math.abs(diff))}/mo`;
+  }
+
+  body.innerHTML = `
+    <div class="rec-why">${info.why}</div>
+    <div class="rec-flow">
+      <div class="rec-plan-box current">
+        <div class="rec-plan-label current-label">Current Plan</div>
+        <div class="rec-plan-name">${info.label}</div>
+        <div class="rec-plan-cost">$${fmtN(currentCost)}<span>/mo</span></div>
+        ${eolBadge}
+      </div>
+      <div class="rec-arrow">
+        <div class="rec-arrow-icon">→</div>
+        <div class="${savingsPillClass}">${savingsText}</div>
+      </div>
+      <div class="rec-plan-box ${recTypeClass}">
+        <div class="rec-plan-label rec-label">⭐ Recommended</div>
+        <div class="rec-plan-name">${recLabel}</div>
+        <div class="rec-plan-cost">$${fmtN(recCost)}<span>/mo</span></div>
+        ${recBadge}
+      </div>
+    </div>
+    <div class="rec-details">
+      ${info.gains.length ? `
+      <div class="rec-detail-box">
+        <div class="rec-detail-title">✅ What You Gain</div>
+        <ul class="rec-detail-list">
+          ${info.gains.map(g=>`<li><span class="gain-icon">+</span>${g}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+      ${info.notes.length ? `
+      <div class="rec-detail-box">
+        <div class="rec-detail-title">📌 Things to Note</div>
+        <ul class="rec-detail-list">
+          ${info.notes.map(n=>`<li><span class="note-icon">ℹ️</span>${n}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+calculate();
+</script>
+</body>
+</html>
